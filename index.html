@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flights to Egypt Eclipse</title>
+<meta name="description" content="Live airfare tracker for Egypt Eclipse 2027: major hubs to Cairo, plus Cairo to Luxor and Aswan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=Tenor+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#101113; --limestone:#E8E2D6; --ivory:#F4F0E8; --nile:#26332F;
+  --gold:#E4BD82; --bronze:#80502C; --muted:#5d5a54; --line:#d6cebf;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--limestone);color:var(--ink);font:18px/1.5 "EB Garamond",Georgia,serif}
+h1,h2,h3,p,li,.lead{text-wrap:pretty}
+h1,h2{text-wrap:balance}
+a{color:inherit}
+.label{font-family:"Tenor Sans",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:11px}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+
+/* Hero */
+header{background:var(--ink);color:var(--ivory);padding:44px 0 36px}
+header .label{color:var(--gold)}
+h1{font:400 clamp(40px,8vw,72px)/1 "Instrument Serif",serif;margin:12px 0 14px}
+h1 em{color:var(--gold)}
+.lead{max-width:620px;color:#d9d3c7;font-size:19px}
+.updated{margin-top:18px;color:#a8a294}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#7fbf8f;margin-right:8px;vertical-align:middle;animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+section{padding:36px 0;border-bottom:1px solid var(--line)}
+h2{font:400 clamp(28px,5vw,40px)/1.1 "Instrument Serif",serif;margin:6px 0 6px}
+.sub{color:var(--muted);margin-bottom:20px}
+
+/* Hub picker */
+.regions{display:grid;gap:14px}
+.region .label{color:var(--bronze);margin-bottom:8px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:13px "Tenor Sans",sans-serif;letter-spacing:.04em;border:1px solid var(--ink);background:transparent;color:var(--ink);
+  padding:8px 12px;border-radius:999px;cursor:pointer;display:flex;gap:8px;align-items:baseline}
+.chip small{font-family:"EB Garamond",serif;font-size:14px;color:var(--bronze)}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--ivory)}
+.chip[aria-pressed=true] small{color:var(--gold)}
+
+/* Best fare card */
+.best{margin-top:26px;background:var(--nile);color:var(--ivory);border-radius:4px;padding:24px;display:grid;gap:18px;grid-template-columns:1fr auto;align-items:end}
+.best .label{color:var(--gold)}
+.price{font:400 clamp(48px,10vw,76px)/1 "Instrument Serif",serif}
+.price small{font-size:.35em;color:#c9c3b6;margin-left:4px}
+.meta{color:#d9d3c7;margin-top:8px}
+.badge{display:inline-block;font:11px "Tenor Sans",sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:999px;margin-top:10px}
+.badge.low{background:#7fbf8f;color:var(--ink)} .badge.typical{background:var(--gold);color:var(--ink)} .badge.high{background:#d98c6a;color:var(--ink)}
+.btn{display:inline-block;font:12px "Tenor Sans",sans-serif;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;
+  background:var(--gold);color:var(--ink);padding:12px 16px;border-radius:2px;white-space:nowrap}
+@media(max-width:600px){.best{grid-template-columns:1fr}.btn{text-align:center}}
+
+/* Date grid */
+.gridwrap{margin-top:28px}
+.grid{display:grid;grid-template-columns:62px repeat(6,1fr);gap:3px;font-size:14px}
+.grid .h{font:10px "Tenor Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;padding:4px 0;align-self:end}
+.grid .rh{text-align:left;align-self:center}
+.cell{border:0;border-radius:2px;padding:12px 2px;text-align:center;cursor:pointer;font:15px "EB Garamond",serif;color:var(--ink);background:var(--ivory)}
+.cell.na{color:#aaa39a;cursor:default}
+.cell.sel{outline:2px solid var(--ink);outline-offset:1px}
+.cell.min{box-shadow:inset 0 0 0 2px var(--gold)}
+.legend{display:flex;justify-content:space-between;margin-top:10px;color:var(--muted)}
+.axis-note{color:var(--muted);font-size:15px;margin-top:6px}
+
+/* Trend */
+.trend{margin-top:28px;background:var(--ivory);border-radius:4px;padding:18px}
+.trend svg{width:100%;height:auto;display:block}
+.trend .empty{color:var(--muted);font-style:italic}
+
+/* All hubs table */
+table{width:100%;border-collapse:collapse}
+th{font:11px "Tenor Sans",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--bronze);text-align:left;padding:8px 6px;border-bottom:1px solid var(--ink)}
+td{padding:12px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+td.p{font:24px "Instrument Serif",serif;white-space:nowrap;text-align:right}
+th.p{text-align:right}
+tr.row{cursor:pointer} tr.row:hover td{background:var(--ivory)}
+.city{font-size:19px}
+.code{font:11px "Tenor Sans",sans-serif;letter-spacing:.1em;color:var(--muted);margin-left:6px}
+.dates{color:var(--muted);font-size:15px}
+@media(max-width:600px){.hide-sm{display:none}}
+
+/* Domestic */
+.dom{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:var(--ivory);border-radius:4px;padding:20px}
+.card h3{font:400 28px/1.1 "Instrument Serif",serif;margin:4px 0 12px}
+.card .label{color:var(--bronze)}
+.leg{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-top:1px solid var(--line);gap:12px}
+.leg a{text-decoration:none}
+.leg .d{white-space:nowrap}
+.leg .air{color:var(--muted);font-size:15px}
+.leg .p{font:26px "Instrument Serif",serif;white-space:nowrap}
+
+footer{padding:32px 0 56px;color:var(--muted);font-size:15px}
+footer p{margin-bottom:10px;max-width:680px}
+.skeleton{color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="label">Egypt Eclipse 2027 · Travel</div>
+    <h1>Flights to <em>Egypt</em></h1>
+    <p class="lead">Live fares from major hubs into Cairo for arrivals July 26 to 30 and departures August 6 to 11, plus flights within Egypt to Luxor and Aswan.</p>
+    <p class="updated label" id="updated"><span class="dot"></span>Loading fares</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="hubs">
+    <div class="label">Round trip to Cairo</div>
+    <h2>Choose your departure city</h2>
+    <p class="sub">Cheapest economy round trip per person, across every arrival and departure date in the window.</p>
+    <div class="regions" id="regions"><p class="skeleton">Loading hubs</p></div>
+
+    <div id="detail"></div>
+
+    <div class="gridwrap">
+      <div class="label" style="color:var(--bronze)">Every date combination</div>
+      <p class="axis-note">Rows are the day you fly to Cairo. Columns are the day you fly home. Tap a fare to see it.</p>
+      <div class="grid" id="grid" style="margin-top:12px"></div>
+      <div class="legend label"><span>Lower</span><span>Higher</span></div>
+    </div>
+
+    <div class="trend">
+      <div class="label" style="color:var(--bronze)">Price trend for the selected dates</div>
+      <div id="trend" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Compare</div>
+    <h2>All hubs at a glance</h2>
+    <p class="sub">Lowest fare we have seen in the latest check for each city.</p>
+    <table>
+      <thead><tr><th>From</th><th class="hide-sm">Best dates</th><th class="hide-sm">Airline</th><th class="p">Round trip</th></tr></thead>
+      <tbody id="table"></tbody>
+    </table>
+  </section>
+
+  <section>
+    <div class="label">Within Egypt</div>
+    <h2>Cairo to Luxor and Aswan</h2>
+    <p class="sub">One way, per person. Short flights of about an hour, mostly on EgyptAir.</p>
+    <div class="dom" id="dom"><p class="skeleton">Loading</p></div>
+  </section>
+
+  <footer>
+    <p>Fares come from Google Flights and are refreshed twice a day. They are a guide, not a booking: prices and seats change by the minute, so confirm on the airline or Google Flights before you buy. Flights are not included in Egypt Eclipse pathways.</p>
+    <p>Prices are in US dollars, economy, one adult, including taxes. "Low", "typical" and "high" are Google's own read on how a fare compares with the usual price for that route.</p>
+  </footer>
+</main>
+
+<script>
+const FEED = "https://ybmevmwefsvigcesjojo.supabase.co/functions/v1/flight-data";
+const ARR = ["2027-07-26","2027-07-27","2027-07-28","2027-07-29","2027-07-30"];
+const DEP = ["2027-08-06","2027-08-07","2027-08-08","2027-08-09","2027-08-10","2027-08-11"];
+
+const $ = id => document.getElementById(id);
+const usd = n => n == null ? "" : "$" + Math.round(n).toLocaleString("en-US");
+const short = n => n == null ? "·" : n >= 10000 ? "$" + (n/1000).toFixed(0) + "k" : usd(n);
+const day = iso => new Date(iso + "T12:00:00Z").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",timeZone:"UTC"});
+const dnum = iso => new Date(iso + "T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",timeZone:"UTC"});
+const dur = m => m ? `${Math.floor(m/60)}h ${m%60}m` : "";
+const stops = s => s == null ? "" : s === 0 ? "Nonstop" : s === 1 ? "1 stop" : `${s} stops`;
+
+async function q(qs){
+  const r = await fetch(FEED + (qs || ""));
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+let rows = [], byRoute = {}, current = null, sel = null;
+
+function bestOf(list){ return list.filter(r => r.price != null).sort((a,b)=>a.price-b.price)[0]; }
+
+function renderHubs(){
+  const intl = rows.filter(r => r.kind === "international");
+  byRoute = {};
+  intl.forEach(r => (byRoute[r.route_id] ??= []).push(r));
+  const routes = Object.values(byRoute).map(l => ({...l[0], best: bestOf(l)})).sort((a,b)=>a.sort-b.sort);
+  const regions = [...new Set(routes.map(r=>r.region))];
+  $("regions").innerHTML = regions.map(reg => `
+    <div class="region"><span class="label">${reg}</span><div class="chips">
+      ${routes.filter(r=>r.region===reg).map(r=>`
+        <button class="chip" data-r="${r.route_id}" aria-pressed="${r.route_id===current}">
+          ${r.origin_city.replace(/ \(.*\)/,"")} <span>${r.origin}</span>${r.best?`<small>${usd(r.best.price)}</small>`:""}
+        </button>`).join("")}
+    </div></div>`).join("");
+  $("regions").querySelectorAll(".chip").forEach(b => b.onclick = () => selectRoute(b.dataset.r));
+
+  $("table").innerHTML = routes.map(r => `
+    <tr class="row" data-r="${r.route_id}">
+      <td><span class="city">${r.origin_city}</span><span class="code">${r.origin}</span>
+        <div class="dates" style="display:none" data-sm>${r.best?`${dnum(r.best.outbound_date)} to ${dnum(r.best.return_date)}`:""}</div></td>
+      <td class="hide-sm dates">${r.best?`${day(r.best.outbound_date)} to ${day(r.best.return_date)}`:"Checking"}</td>
+      <td class="hide-sm dates">${r.best?.airline ?? ""}${r.best?` · ${stops(r.best.stops)}`:""}</td>
+      <td class="p">${r.best?usd(r.best.price):"·"}</td>
+    </tr>`).join("");
+  if (matchMedia("(max-width:600px)").matches) document.querySelectorAll("[data-sm]").forEach(e=>e.style.display="block");
+  $("table").querySelectorAll("tr").forEach(tr => tr.onclick = () => { selectRoute(tr.dataset.r); $("hubs").scrollIntoView({behavior:"smooth"}); });
+}
+
+function selectRoute(id){
+  current = id;
+  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c.dataset.r === id));
+  const list = byRoute[id] || [];
+  sel = bestOf(list) || list[0];
+  renderGrid(); renderDetail(); renderTrend();
+  try { localStorage.setItem("ee-hub", id); } catch(e){}
+}
+
+function renderDetail(){
+  const r = sel;
+  if(!r){ $("detail").innerHTML = ""; return; }
+  if(r.price == null){
+    $("detail").innerHTML = `<div class="best"><div><div class="label">${r.origin_city} to Cairo</div>
+      <div class="meta">${r.checked_at ? "No fares found for these dates in the latest check." : "First prices for this city arrive with the next update."}</div></div></div>`;
+    return;
+  }
+  const lvl = (r.price_level||"").toLowerCase();
+  $("detail").innerHTML = `
+    <div class="best">
+      <div>
+        <div class="label">${r.origin_city} to Cairo · ${day(r.outbound_date)} to ${day(r.return_date)}</div>
+        <div class="price">${usd(r.price)}<small>round trip</small></div>
+        <div class="meta">${r.airline ?? ""} · ${stops(r.stops)}${r.duration_min?` · ${dur(r.duration_min)} outbound`:""}</div>
+        ${lvl?`<span class="badge ${lvl}">${lvl} for this route${r.typical_low?` · usually ${usd(r.typical_low)} to ${usd(r.typical_high)}`:""}</span>`:""}
+      </div>
+      ${r.google_url?`<a class="btn" href="${r.google_url}" target="_blank" rel="noopener">See on Google Flights</a>`:""}
+    </div>`;
+}
+
+function renderGrid(){
+  const list = byRoute[current] || [];
+  const map = {}; list.forEach(r => map[r.outbound_date+"|"+r.return_date] = r);
+  const prices = list.map(r=>r.price).filter(p=>p!=null);
+  const lo = Math.min(...prices), hi = Math.max(...prices);
+  const color = p => {
+    if(p==null || !prices.length) return ["var(--ivory)","#aaa39a"];
+    const t = hi===lo ? 0 : (p-lo)/(hi-lo);           // 0 = cheapest
+    const a = [38,51,47], b = [232,226,214];          // nile -> limestone
+    const c = a.map((v,i)=>Math.round(v+(b[i]-v)*(0.15+0.85*t)));
+    return [`rgb(${c})`, t < 0.5 ? "#F4F0E8" : "#101113"];
+  };
+  let h = `<div></div>` + DEP.map(d=>`<div class="h">${dnum(d)}</div>`).join("");
+  ARR.forEach(a => {
+    h += `<div class="h rh">${dnum(a)}</div>`;
+    DEP.forEach(d => {
+      const r = map[a+"|"+d]; const p = r?.price;
+      const [bg,fg] = color(p);
+      const cls = ["cell", p==null?"na":"", r && sel && r.search_id===sel.search_id?"sel":"", p!=null&&p===lo?"min":""].join(" ");
+      h += `<button class="${cls}" style="background:${bg};color:${fg}" data-s="${r?.search_id??""}" aria-label="Arrive ${a}, depart ${d}: ${p!=null?usd(p):"no fare yet"}">${short(p)}</button>`;
+    });
+  });
+  $("grid").innerHTML = h;
+  $("grid").querySelectorAll(".cell:not(.na)").forEach(c => c.onclick = () => {
+    sel = list.find(r => String(r.search_id) === c.dataset.s);
+    renderGrid(); renderDetail(); renderTrend();
+  });
+}
+
+async function renderTrend(){
+  const el = $("trend");
+  if(!sel){ el.innerHTML = ""; return; }
+  const id = sel.search_id;
+  let hist = [];
+  try { hist = await q(`?history=${id}`); } catch(e){}
+  if(sel?.search_id !== id) return;
+  if(hist.length < 2){ el.innerHTML = `<p class="empty">The trend fills in after a few checks of these dates.</p>`; return; }
+  const W=640,H=180,P=36;
+  const xs = hist.map((_,i)=>P+(W-P*2)*i/(hist.length-1));
+  const ps = hist.map(h=>h.price), lo=Math.min(...ps), hi=Math.max(...ps), span=(hi-lo)||1;
+  const ys = ps.map(p=>H-P+ -(H-P*2)*(p-lo)/span);
+  const path = xs.map((x,i)=>`${i?"L":"M"}${x.toFixed(1)},${ys[i].toFixed(1)}`).join("");
+  const last = ps[ps.length-1], first = ps[0], delta = last-first;
+  el.innerHTML = `
+    <p style="margin-bottom:6px">${dnum(hist[0].day)} to today: ${delta===0?"flat":delta<0?`down ${usd(-delta)}`:`up ${usd(delta)}`} for ${dnum(sel.outbound_date)} to ${dnum(sel.return_date)}.</p>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Price history">
+      <line x1="${P}" x2="${W-P}" y1="${H-P}" y2="${H-P}" stroke="#d6cebf"/>
+      <text x="${P}" y="${P-14}" font-size="12" fill="#5d5a54" font-family="Tenor Sans">${usd(hi)}</text>
+      <text x="${P}" y="${H-P+18}" font-size="12" fill="#5d5a54" font-family="Tenor Sans">${dnum(hist[0].day)}</text>
+      <text x="${W-P}" y="${H-P+18}" font-size="12" fill="#5d5a54" font-family="Tenor Sans" text-anchor="end">${dnum(hist.at(-1).day)}</text>
+      <path d="${path}" fill="none" stroke="#26332F" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="${xs.at(-1)}" cy="${ys.at(-1)}" r="5" fill="#E4BD82" stroke="#101113"/>
+      <text x="${xs.at(-1)-8}" y="${ys.at(-1)-10}" font-size="14" fill="#101113" text-anchor="end" font-family="EB Garamond">${usd(last)}</text>
+    </svg>`;
+}
+
+function renderDomestic(){
+  const d = rows.filter(r => r.kind === "domestic");
+  const card = (title, sub, ids) => {
+    const legs = d.filter(r => ids.includes(r.route_id)).sort((a,b)=>a.outbound_date.localeCompare(b.outbound_date)||a.route_id.localeCompare(b.route_id));
+    return `<div class="card"><div class="label">${sub}</div><h3>${title}</h3>
+      ${legs.map(r=>`<div class="leg">
+        <div><div class="d">${day(r.outbound_date)}${ids.length>1?` · ${r.destination_city==="Cairo"?r.origin_city:r.destination_city}`:""}</div>
+        <div class="air">${r.price!=null?`${r.airline??""}${r.depart_time?` · ${r.depart_time}`:""} · ${stops(r.stops)}`:(r.checked_at?"No fares found":"Checking soon")}</div>
+        ${r.price_level==="high"&&r.typical_low?`<div class="air" style="color:var(--bronze)">Usually ${usd(r.typical_low)} to ${usd(r.typical_high)}. Cheaper fares often open closer in.</div>`:""}</div>
+        ${r.price!=null && r.google_url?`<a class="p" href="${r.google_url}" target="_blank" rel="noopener">${usd(r.price)}</a>`:`<span class="p">·</span>`}
+      </div>`).join("")}</div>`;
+  };
+  $("dom").innerHTML =
+    card("Cairo to Luxor","July 28 to 30",["CAI-LXR"]) +
+    card("Cairo to Aswan","July 28 to 30",["CAI-ASW"]) +
+    card("Back to Cairo","August 6",["LXR-CAI","ASW-CAI"]);
+}
+
+async function load(){
+  try{
+    rows = await q();
+  }catch(e){
+    $("updated").textContent = "Fares are unavailable right now. Please try again shortly.";
+    return;
+  }
+  const last = rows.map(r=>r.checked_at).filter(Boolean).sort().at(-1);
+  $("updated").innerHTML = `<span class="dot"></span>` + (last
+    ? "Updated " + new Date(last).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})
+    : "First fares arrive with the next update");
+  renderHubs(); renderDomestic();
+  let saved = null; try { saved = localStorage.getItem("ee-hub"); } catch(e){}
+  const routes = Object.keys(byRoute);
+  const cheapest = routes.map(id=>bestOf(byRoute[id])).filter(Boolean).sort((a,b)=>a.price-b.price)[0];
+  selectRoute(routes.includes(saved) ? saved : (cheapest?.route_id ?? routes[0]));
+}
+load();
+</script>
+</body>
+</html>
