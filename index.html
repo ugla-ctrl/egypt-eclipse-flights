@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Flights to Egypt · Egypt Eclipse 2027</title>
-<meta name="description" content="Live fares from 17 major hubs to Cairo for Egypt Eclipse 2027, plus flights to Luxor and Aswan. Refreshed twice a day from Google Flights.">
+<meta name="description" content="Live fares for Egypt Eclipse 2027: Cairo to Luxor and Aswan, where prices swing the most, plus round trips to Cairo from 17 major hubs. Refreshed twice a day.">
 <link rel="canonical" href="https://flights.egypt-eclipse.com/">
 <meta name="theme-color" content="#101113">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -13,15 +13,15 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Egypt Eclipse">
 <meta property="og:url" content="https://flights.egypt-eclipse.com/">
-<meta property="og:title" content="Flights to Egypt · Egypt Eclipse 2027">
-<meta property="og:description" content="Live fares from 17 major hubs to Cairo, plus Luxor and Aswan. Refreshed twice a day.">
+<meta property="og:title" content="Flights to Totality · Egypt Eclipse 2027">
+<meta property="og:description" content="Live fares to Cairo from 17 major hubs, plus the Luxor and Aswan flights where prices swing the most.">
 <meta property="og:image" content="https://flights.egypt-eclipse.com/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Flights to Egypt: routes from major hubs arcing to Cairo">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Flights to Egypt · Egypt Eclipse 2027">
-<meta name="twitter:description" content="Live fares from 17 major hubs to Cairo, plus Luxor and Aswan. Refreshed twice a day.">
+<meta name="twitter:title" content="Flights to Totality · Egypt Eclipse 2027">
+<meta name="twitter:description" content="Live fares to Cairo from 17 major hubs, plus the Luxor and Aswan flights where prices swing the most.">
 <meta name="twitter:image" content="https://flights.egypt-eclipse.com/og.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,6 +84,8 @@ h2{font:400 clamp(28px,5vw,40px)/1.1 "Instrument Serif",serif;margin:6px 0 6px}
 .maplegend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 6px 0;color:var(--muted)}
 .ramp{flex:0 1 160px;height:8px;border-radius:4px;background:linear-gradient(90deg,#3f7d5c,#E4BD82,#b5562f)}
 .maprange{margin-left:auto;font-size:15px}
+.domkey{display:inline-flex;align-items:center;gap:8px;font-size:15px;color:#b5562f;text-decoration:none;margin-left:8px}
+.dia{width:8px;height:8px;background:#b5562f;transform:rotate(45deg);display:inline-block}
 
 /* Best fare card */
 .best{margin-top:26px;background:var(--nile);color:var(--ivory);border-radius:4px;padding:24px;display:grid;gap:18px;grid-template-columns:1fr auto;align-items:end}
@@ -141,7 +143,17 @@ tr.row{cursor:pointer} tr.row:hover td{background:var(--ivory)}
 .leg a{text-decoration:none}
 .leg .d{white-space:nowrap}
 .leg .air{color:var(--muted);font-size:15px}
-.leg .p{font:26px "Instrument Serif",serif;white-space:nowrap}
+.leg .p{font:26px "Instrument Serif",serif;white-space:nowrap;text-align:right}
+.leg .x{display:block;font:10px "Tenor Sans",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#b5562f;margin-top:2px}
+section.hot{border-bottom:0}
+.domstat{font:400 clamp(24px,4.5vw,32px)/1.2 "Instrument Serif",serif;margin:-4px 0 20px;text-wrap:balance}
+.domstat em{color:#b5562f;font-style:normal}
+.jump{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.jump a{display:flex;flex-direction:column;gap:3px;text-decoration:none;border:1px solid #3a3d40;border-radius:3px;padding:10px 14px;min-width:180px}
+.jump a:first-child{border-color:var(--gold)}
+.jump a .label{color:var(--gold)}
+.jump a span:last-child{font-size:18px;color:var(--ivory)}
+@media(max-width:600px){.jump a{flex:1 1 140px;min-width:0}}
 
 footer{padding:32px 0 56px;color:var(--muted);font-size:15px}
 footer p{margin-bottom:10px;max-width:680px}
@@ -154,12 +166,25 @@ footer p{margin-bottom:10px;max-width:680px}
   <div class="wrap">
     <div class="label">Egypt Eclipse 2027 · Travel</div>
     <h1>Flights to <em>Egypt</em></h1>
-    <p class="lead">Live fares from major hubs into Cairo for arrivals July 26 to 30 and departures August 6 to 11, plus flights within Egypt to Luxor and Aswan.</p>
+    <p class="lead">Live fares from 17 major hubs into Cairo, and the Cairo to Luxor and Aswan flights where prices swing the most around eclipse week.</p>
+    <nav class="jump">
+      <a href="#domestic"><span class="label">Within Egypt</span><span>Luxor and Aswan</span></a>
+      <a href="#hubs"><span class="label">International</span><span>Round trip to Cairo</span></a>
+    </nav>
     <p class="updated label" id="updated"><span class="dot"></span>Loading fares</p>
   </div>
 </header>
 
 <main class="wrap">
+
+  <section id="domestic" class="hot">
+    <div class="label">Within Egypt · Watch these closely</div>
+    <h2>Cairo to Luxor and Aswan</h2>
+    <p class="sub">These hour-long hops see the biggest demand and the widest price swings around eclipse week. Seats are limited, so they are the fares to watch and book early.</p>
+    <p class="domstat" id="domstat"></p>
+    <div class="dom" id="dom"><p class="skeleton">Loading</p></div>
+    <p class="axis-note">One way, per person. "Usual" is Google's typical price range for each route.</p>
+  </section>
 
   <section id="hubs">
     <div class="label">Round trip to Cairo</div>
@@ -169,6 +194,7 @@ footer p{margin-bottom:10px;max-width:680px}
       <svg id="map" role="img" aria-label="World map of round-trip fares to Cairo by departure city"></svg>
       <figcaption class="maplegend">
         <span class="label">Lower</span><span class="ramp"></span><span class="label">Higher</span>
+        <a class="domkey" href="#domestic"><span class="dia"></span>Luxor and Aswan, one way</a>
         <span class="maprange" id="maprange"></span>
       </figcaption>
     </figure>
@@ -203,13 +229,6 @@ footer p{margin-bottom:10px;max-width:680px}
       <thead><tr><th>From</th><th class="hide-sm">Best dates</th><th class="hide-sm">Airline</th><th class="p">Round trip</th></tr></thead>
       <tbody id="table"></tbody>
     </table>
-  </section>
-
-  <section>
-    <div class="label">Within Egypt</div>
-    <h2>Cairo to Luxor and Aswan</h2>
-    <p class="sub">One way, per person. Short flights of about an hour, mostly on EgyptAir.</p>
-    <div class="dom" id="dom"><p class="skeleton">Loading</p></div>
   </section>
 
   <footer>
@@ -321,9 +340,24 @@ async function renderMap(){
   svg.append("circle").attr("class","cai").attr("cx",cx).attr("cy",cy).attr("r",6);
   svg.append("text").attr("class","cailbl").attr("x",cx).attr("y",cy+19).attr("text-anchor","middle").text("CAIRO");
 
+  // Luxor and Aswan legs (cheapest one-way from Cairo)
+  const DOM = {LXR:[32.71,25.67], ASW:[32.82,23.96]};
+  const domPts = Object.entries(DOM).map(([code,ll]) => {
+    const f = rows.filter(r => r.kind==="domestic" && r.origin==="CAI" && r.destination===code && r.price!=null);
+    return {id:"dom-"+code, code, dom:true, best: f.sort((a,b)=>a.price-b.price)[0], xy: proj(ll)};
+  });
+  svg.append("g").selectAll("path").data(domPts).join("path")
+    .attr("fill","none").attr("stroke","#b5562f").attr("stroke-width",2).attr("stroke-dasharray","3 3")
+    .attr("d", p => path({type:"LineString", coordinates:[CAI, DOM[p.code]]}));
+  svg.append("g").selectAll("rect").data(domPts).join("rect")
+    .attr("x", p=>p.xy[0]-4.5).attr("y", p=>p.xy[1]-4.5).attr("width",9).attr("height",9)
+    .attr("transform", p=>`rotate(45 ${p.xy[0]} ${p.xy[1]})`)
+    .attr("fill","#b5562f").attr("stroke","#F4F0E8").attr("stroke-width",1.5).style("cursor","pointer")
+    .on("click", () => $("domestic").scrollIntoView({behavior:"smooth"}));
+
   // hub dots
-  const pts = routes.map(r => ({...r, xy: proj(HUBS[r.code])}));
-  const g = svg.append("g").selectAll("g").data(pts).join("g")
+  const pts = routes.map(r => ({...r, xy: proj(HUBS[r.code])})).concat(domPts);
+  const g = svg.append("g").selectAll("g").data(pts.filter(p=>!p.dom)).join("g")
     .attr("class", r => "hub" + (r.id===current?" on":""))
     .attr("transform", r => `translate(${r.xy})`)
     .on("click", (e,r) => selectRoute(r.id));
@@ -361,7 +395,8 @@ async function renderMap(){
     }
     const t = lbl.append("text").attr("class","lbl"+(p.id===current?" on":"")).attr("x",spot.b.x).attr("y",spot.b.y+h-3);
     t.append("tspan").attr("class","c").text(p.code+" ");
-    t.append("tspan").text(txt);
+    const tp = t.append("tspan").text(txt);
+    if(p.dom) tp.attr("fill","#b5562f");
   }
 }
 let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(renderMap, 200); });
@@ -465,10 +500,19 @@ function renderDomestic(){
       ${legs.map(r=>`<div class="leg">
         <div><div class="d">${day(r.outbound_date)}${ids.length>1?` · ${r.destination_city==="Cairo"?r.origin_city:r.destination_city}`:""}</div>
         <div class="air">${r.price!=null?`${r.airline??""}${r.depart_time?` · ${r.depart_time}`:""} · ${stops(r.stops)}`:(r.checked_at?"No fares found":"Checking soon")}</div>
-        ${r.price_level==="high"&&r.typical_low?`<div class="air" style="color:var(--bronze)">Usually ${usd(r.typical_low)} to ${usd(r.typical_high)}. Cheaper fares often open closer in.</div>`:""}</div>
-        ${r.price!=null && r.google_url?`<a class="p" href="${r.google_url}" target="_blank" rel="noopener">${usd(r.price)}</a>`:`<span class="p">·</span>`}
+        ${r.typical_low?`<div class="air">Usually ${usd(r.typical_low)} to ${usd(r.typical_high)}</div>`:""}</div>
+        ${r.price!=null && r.google_url?`<a class="p" href="${r.google_url}" target="_blank" rel="noopener">${usd(r.price)}${mult(r)}</a>`:`<span class="p">·</span>`}
       </div>`).join("")}</div>`;
   };
+  const mult = r => (r.price!=null && r.typical_high && r.price > r.typical_high*1.15) ? `<span class="x">${(r.price/r.typical_high).toFixed(1)}× usual</span>` : "";
+  const priced = d.filter(r => r.price!=null && r.typical_high);
+  if(priced.length){
+    const lo = Math.min(...priced.map(r=>r.price)), hi = Math.max(...priced.map(r=>r.price));
+    const uLo = Math.min(...priced.map(r=>r.typical_low)), uHi = Math.max(...priced.map(r=>r.typical_high));
+    $("domstat").innerHTML = hi > uHi*1.15
+      ? `Right now <span style="white-space:nowrap"><em>${usd(lo)} to ${usd(hi)}</em> one way,</span> against a usual ${usd(uLo)} to ${usd(uHi)}.`
+      : `Right now ${usd(lo)} to ${usd(hi)} one way, close to the usual ${usd(uLo)} to ${usd(uHi)}.`;
+  }
   $("dom").innerHTML =
     card("Cairo to Luxor","July 28 to 30",["CAI-LXR"]) +
     card("Cairo to Aswan","July 28 to 30",["CAI-ASW"]) +
