@@ -46,6 +46,27 @@ h2{font:400 clamp(28px,5vw,40px)/1.1 "Instrument Serif",serif;margin:6px 0 6px}
 .chip[aria-pressed=true]{background:var(--ink);color:var(--ivory)}
 .chip[aria-pressed=true] small{color:var(--gold)}
 
+/* Map */
+.map{margin:0 0 26px;background:var(--ivory);border-radius:4px;padding:10px 10px 14px;overflow:hidden}
+.map svg{display:block;width:100%;height:auto}
+.map .land{fill:#ddd3c1;stroke:var(--ivory);stroke-width:.6}
+.map .arc{fill:none;stroke-width:1.2;opacity:.45;stroke-linecap:round}
+.map .arc.on{opacity:1;stroke-width:2.4}
+.map .hub{cursor:pointer}
+.map .hub circle{stroke:var(--ivory);stroke-width:1.5}
+.map .hub.on circle{stroke:var(--ink);stroke-width:2}
+.map .lbl{font:13px "EB Garamond",serif;fill:var(--ink);paint-order:stroke;stroke:var(--ivory);stroke-width:3.5px;stroke-linejoin:round;pointer-events:none}
+.map .lbl .c{font:10px "Tenor Sans",sans-serif;letter-spacing:.08em;fill:var(--muted)}
+.map .lbl.on{font-weight:500}
+.map svg.narrow .lbl{font-size:11px;stroke-width:3px}
+.map svg.narrow .lbl .c{font-size:8.5px;letter-spacing:.04em}
+.map .lead{stroke:#b9ae9a;stroke-width:.8}
+.map .cai{fill:var(--gold);stroke:var(--ink);stroke-width:1.2}
+.map .cailbl{font:11px "Tenor Sans",sans-serif;letter-spacing:.12em;fill:var(--ink);paint-order:stroke;stroke:var(--ivory);stroke-width:3.5px}
+.maplegend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 6px 0;color:var(--muted)}
+.ramp{flex:0 1 160px;height:8px;border-radius:4px;background:linear-gradient(90deg,#3f7d5c,#E4BD82,#b5562f)}
+.maprange{margin-left:auto;font-size:15px}
+
 /* Best fare card */
 .best{margin-top:26px;background:var(--nile);color:var(--ivory);border-radius:4px;padding:24px;display:grid;gap:18px;grid-template-columns:1fr auto;align-items:end}
 .best .label{color:var(--gold)}
@@ -64,7 +85,13 @@ h2{font:400 clamp(28px,5vw,40px)/1.1 "Instrument Serif",serif;margin:6px 0 6px}
 .grid .h{font:10px "Tenor Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;padding:4px 0;align-self:end}
 .grid .rh{text-align:left;align-self:center}
 .cell{border:0;border-radius:2px;padding:12px 2px;text-align:center;cursor:pointer;font:15px "EB Garamond",serif;color:var(--ink);background:var(--ivory)}
-.cell.na{color:#aaa39a;cursor:default}
+.cell.na{color:#aaa39a;cursor:default;background:transparent;border:1px dashed #c9bfae}
+.cell .star{font-size:.75em;margin-right:3px;color:var(--gold)}
+@media(max-width:600px){.cell{font-size:13px;padding:11px 0}.cell .star{display:none}.grid{grid-template-columns:46px repeat(6,1fr)}}
+.key{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;color:var(--muted);font-size:15px}
+.key .k{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.key .sw{display:inline-block;width:18px;height:12px;border-radius:2px}
+.key .sw.ramp{width:40px;flex:none}
 .cell.sel{outline:2px solid var(--ink);outline-offset:1px}
 .cell.min{box-shadow:inset 0 0 0 2px var(--gold)}
 .legend{display:flex;justify-content:space-between;margin-top:10px;color:var(--muted)}
@@ -120,15 +147,28 @@ footer p{margin-bottom:10px;max-width:680px}
     <div class="label">Round trip to Cairo</div>
     <h2>Choose your departure city</h2>
     <p class="sub">Cheapest economy round trip per person, across every arrival and departure date in the window.</p>
+    <figure class="map" id="mapwrap">
+      <svg id="map" role="img" aria-label="World map of round-trip fares to Cairo by departure city"></svg>
+      <figcaption class="maplegend">
+        <span class="label">Lower</span><span class="ramp"></span><span class="label">Higher</span>
+        <span class="maprange" id="maprange"></span>
+      </figcaption>
+    </figure>
     <div class="regions" id="regions"><p class="skeleton">Loading hubs</p></div>
 
     <div id="detail"></div>
 
     <div class="gridwrap">
       <div class="label" style="color:var(--bronze)">Every date combination</div>
-      <p class="axis-note">Rows are the day you fly to Cairo. Columns are the day you fly home. Tap a fare to see it.</p>
+      <p class="axis-note">Each row is the day you land in Cairo, each column the day you fly home. Tap any fare to see the flight.</p>
       <div class="grid" id="grid" style="margin-top:12px"></div>
-      <div class="legend label"><span>Lower</span><span>Higher</span></div>
+      <div class="key">
+        <span class="k"><span class="sw ramp"></span>Lower to higher fare</span>
+        <span class="k"><span class="sw" style="box-shadow:inset 0 0 0 2px var(--gold);background:#3f7d5c"></span>★ Cheapest</span>
+        <span class="k"><span class="sw" style="outline:2px solid var(--ink);outline-offset:1px;background:#3f7d5c"></span>Shown above</span>
+        <span class="k"><span class="sw" style="border:1px dashed #c9bfae"></span>Not checked yet</span>
+      </div>
+      <p class="axis-note" id="gridnote"></p>
     </div>
 
     <div class="trend">
@@ -160,6 +200,8 @@ footer p{margin-bottom:10px;max-width:680px}
   </footer>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <script>
 const FEED = "https://ybmevmwefsvigcesjojo.supabase.co/functions/v1/flight-data";
 const ARR = ["2027-07-26","2027-07-27","2027-07-28","2027-07-29","2027-07-30"];
@@ -210,12 +252,108 @@ function renderHubs(){
   $("table").querySelectorAll("tr").forEach(tr => tr.onclick = () => { selectRoute(tr.dataset.r); $("hubs").scrollIntoView({behavior:"smooth"}); });
 }
 
+/* ---------- World map ---------- */
+const HUBS = {JFK:[-73.78,40.64],EWR:[-74.17,40.69],IAD:[-77.46,38.95],ORD:[-87.90,41.98],ATL:[-84.43,33.64],
+  MIA:[-80.29,25.79],DFW:[-97.04,32.90],IAH:[-95.34,29.99],LAX:[-118.41,33.94],SFO:[-122.38,37.62],
+  LHR:[-0.45,51.47],CDG:[2.55,49.01],FRA:[8.56,50.03],AMS:[4.76,52.31],IST:[28.74,41.26],DXB:[55.36,25.25],DOH:[51.61,25.27]};
+const CAI = [31.41,30.12];
+let world = null;
+async function loadWorld(){
+  if(world || !window.topojson) return world;
+  try{
+    const t = await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json").then(r=>r.json());
+    world = topojson.feature(t, t.objects.countries);
+  }catch(e){}
+  return world;
+}
+
+async function renderMap(){
+  const svgEl = $("map");
+  if(!window.d3){ $("mapwrap").style.display="none"; return; }
+  await loadWorld();
+  const routes = Object.keys(byRoute).map(id => ({id, code:id.split("-")[0], best:bestOf(byRoute[id])}))
+    .filter(r => HUBS[r.code]);
+  const priced = routes.filter(r=>r.best).map(r=>r.best.price);
+  const lo = Math.min(...priced), hi = Math.max(...priced);
+  const ramp = d3.interpolateRgbBasis(["#3f7d5c","#E4BD82","#b5562f"]);
+  const col = p => p==null ? "#b9ae9a" : ramp(hi===lo ? 0 : (Math.log(p)-Math.log(lo))/(Math.log(hi)-Math.log(lo)));
+  $("maprange").textContent = priced.length ? `${usd(lo)} to ${usd(hi)} round trip` : "";
+
+  const W = svgEl.parentElement.clientWidth - 20;
+  const narrow = W < 560;
+  const H = Math.round(W * (narrow ? 0.95 : 0.5));
+  const svg = d3.select(svgEl).attr("viewBox", `0 0 ${W} ${H}`);
+  svg.selectAll("*").remove();
+  const frame = {type:"MultiPoint", coordinates:[[-126,14],[62,14],[-126,58],[62,58],[-20,62]]};
+  const pad = narrow ? H*0.2 : 8;
+  const proj = d3.geoNaturalEarth1().fitExtent([[6,pad],[W-6,H-pad]], frame);
+  const path = d3.geoPath(proj);
+
+  if(world) svg.append("g").selectAll("path").data(world.features).join("path").attr("class","land").attr("d", path);
+
+  // arcs (great circles), selected one drawn last
+  const order = [...routes].sort((a,b)=>(a.id===current)-(b.id===current));
+  svg.append("g").selectAll("path").data(order).join("path")
+    .attr("class", r => "arc" + (r.id===current?" on":""))
+    .attr("stroke", r => col(r.best?.price))
+    .attr("d", r => path({type:"LineString", coordinates:[HUBS[r.code], CAI]}));
+
+  // Cairo
+  const [cx,cy] = proj(CAI);
+  svg.append("circle").attr("class","cai").attr("cx",cx).attr("cy",cy).attr("r",6);
+  svg.append("text").attr("class","cailbl").attr("x",cx).attr("y",cy+19).attr("text-anchor","middle").text("CAIRO");
+
+  // hub dots
+  const pts = routes.map(r => ({...r, xy: proj(HUBS[r.code])}));
+  const g = svg.append("g").selectAll("g").data(pts).join("g")
+    .attr("class", r => "hub" + (r.id===current?" on":""))
+    .attr("transform", r => `translate(${r.xy})`)
+    .on("click", (e,r) => selectRoute(r.id));
+  g.append("circle").attr("r", r => r.id===current ? 7 : 5.5).attr("fill", r => col(r.best?.price));
+  g.append("title").text(r => `${r.best?.origin_city ?? r.code}: ${r.best?usd(r.best.price):"checking"}`);
+
+  // labels with simple collision avoidance, selected + cheapest placed first
+  const fs = narrow ? 11 : 13, cw = narrow ? 6.1 : 7.2;
+  svg.classed("narrow", narrow);
+  const boxes = [{x:cx-8,y:cy-8,w:16,h:16},{x:cx-24,y:cy+8,w:48,h:14}];
+  pts.forEach(p => boxes.push({x:p.xy[0]-6,y:p.xy[1]-6,w:12,h:12}));
+  const hit = b => boxes.some(o => b.x < o.x+o.w && b.x+b.w > o.x && b.y < o.y+o.h && b.y+b.h > o.y)
+                  || b.x < 2 || b.x+b.w > W-2 || b.y < 2 || b.y+b.h > H-2;
+  const lbl = svg.append("g");
+  const placeOrder = [...pts].sort((a,b)=>(b.id===current)-(a.id===current) || (a.best?.price??1e9)-(b.best?.price??1e9));
+  for(const p of placeOrder){
+    const txt = p.best ? usd(p.best.price) : "·";
+    const w = (p.code.length+1)*cw + txt.length*cw*0.95, h = fs+2;
+    let spot = null;
+    outer: for(const rad of (narrow ? [8,14,22,32,44,58,74,92] : [9,16,26,38,52])){
+      for(let a=0;a<16;a++){
+        const ang = a*Math.PI/8;
+        const dx = Math.cos(ang)*rad, dy = Math.sin(ang)*rad;
+        const bx = p.xy[0] + dx + (Math.cos(ang) < -0.3 ? -w : Math.cos(ang) > 0.3 ? 0 : -w/2);
+        const by = p.xy[1] + dy - h/2;
+        const b = {x:bx,y:by,w,h};
+        if(!hit(b)){ spot = {b,rad}; break outer; }
+      }
+    }
+    if(!spot) continue;
+    boxes.push(spot.b);
+    if(spot.rad > 12){
+      const tx = Math.max(spot.b.x, Math.min(p.xy[0], spot.b.x+spot.b.w)), ty = Math.max(spot.b.y, Math.min(p.xy[1], spot.b.y+spot.b.h));
+      lbl.append("line").attr("class","lead").attr("x1",p.xy[0]).attr("y1",p.xy[1]).attr("x2",tx).attr("y2",ty);
+    }
+    const t = lbl.append("text").attr("class","lbl"+(p.id===current?" on":"")).attr("x",spot.b.x).attr("y",spot.b.y+h-3);
+    t.append("tspan").attr("class","c").text(p.code+" ");
+    t.append("tspan").text(txt);
+  }
+}
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(renderMap, 200); });
+
 function selectRoute(id){
   current = id;
   document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c.dataset.r === id));
   const list = byRoute[id] || [];
   sel = bestOf(list) || list[0];
-  renderGrid(); renderDetail(); renderTrend();
+  renderGrid(); renderDetail(); renderTrend(); renderMap();
   try { localStorage.setItem("ee-hub", id); } catch(e){}
 }
 
@@ -234,7 +372,7 @@ function renderDetail(){
         <div class="label">${r.origin_city} to Cairo · ${day(r.outbound_date)} to ${day(r.return_date)}</div>
         <div class="price">${usd(r.price)}<small>round trip</small></div>
         <div class="meta">${r.airline ?? ""} · ${stops(r.stops)}${r.duration_min?` · ${dur(r.duration_min)} outbound`:""}</div>
-        ${lvl?`<span class="badge ${lvl}">${lvl} for this route${r.typical_low?` · usually ${usd(r.typical_low)} to ${usd(r.typical_high)}`:""}</span>`:""}
+        ${lvl?`<span class="badge ${lvl}">${lvl} fare${r.typical_low?` · usually ${usd(r.typical_low)} to ${usd(r.typical_high)}`:""}</span>`:""}
       </div>
       ${r.google_url?`<a class="btn" href="${r.google_url}" target="_blank" rel="noopener">See on Google Flights</a>`:""}
     </div>`;
@@ -245,13 +383,17 @@ function renderGrid(){
   const map = {}; list.forEach(r => map[r.outbound_date+"|"+r.return_date] = r);
   const prices = list.map(r=>r.price).filter(p=>p!=null);
   const lo = Math.min(...prices), hi = Math.max(...prices);
+  const ramp = window.d3 ? d3.interpolateRgbBasis(["#3f7d5c","#E4BD82","#b5562f"]) : null;
   const color = p => {
-    if(p==null || !prices.length) return ["var(--ivory)","#aaa39a"];
+    if(p==null || !prices.length) return ["transparent","#b9ae9a"];
     const t = hi===lo ? 0 : (p-lo)/(hi-lo);           // 0 = cheapest
-    const a = [38,51,47], b = [232,226,214];          // nile -> limestone
-    const c = a.map((v,i)=>Math.round(v+(b[i]-v)*(0.15+0.85*t)));
-    return [`rgb(${c})`, t < 0.5 ? "#F4F0E8" : "#101113"];
+    if(!ramp) return ["#3f7d5c","#F4F0E8"];
+    return [ramp(t), (t > 0.3 && t < 0.75) ? "#101113" : "#F4F0E8"];
   };
+  const checked = list.filter(r => r.checked_at).length;
+  $("gridnote").textContent = checked < list.length
+    ? `${checked} of ${list.length} date pairs checked so far. The rest fill in over the next few days.`
+    : `All ${list.length} date pairs checked.`;
   let h = `<div></div>` + DEP.map(d=>`<div class="h">${dnum(d)}</div>`).join("");
   ARR.forEach(a => {
     h += `<div class="h rh">${dnum(a)}</div>`;
@@ -259,7 +401,8 @@ function renderGrid(){
       const r = map[a+"|"+d]; const p = r?.price;
       const [bg,fg] = color(p);
       const cls = ["cell", p==null?"na":"", r && sel && r.search_id===sel.search_id?"sel":"", p!=null&&p===lo?"min":""].join(" ");
-      h += `<button class="${cls}" style="background:${bg};color:${fg}" data-s="${r?.search_id??""}" aria-label="Arrive ${a}, depart ${d}: ${p!=null?usd(p):"no fare yet"}">${short(p)}</button>`;
+      const label = p!=null ? short(p) : (r?.checked_at ? "None" : "");
+      h += `<button class="${cls}" style="background:${bg};color:${fg}" data-s="${r?.search_id??""}" aria-label="Arrive ${a}, depart ${d}: ${p!=null?usd(p):"not checked yet"}">${p!=null&&p===lo?"<span class=\"star\">★</span>":""}${label}</button>`;
     });
   });
   $("grid").innerHTML = h;
