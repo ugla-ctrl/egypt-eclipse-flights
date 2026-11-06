@@ -1,0 +1,38 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Instrument+Serif:ital@0;1&family=Tenor+Sans&display=block" rel="stylesheet">
+<style>
+*{margin:0;padding:0}body{width:1200px;height:630px;background:#101113;overflow:hidden;position:relative;color:#F4F0E8}
+svg{position:absolute;inset:0}
+.t{position:absolute;left:72px;top:150px}
+.l{font:20px "Tenor Sans";letter-spacing:.2em;color:#E4BD82;text-transform:uppercase}
+h1{font:400 128px/1 "Instrument Serif";margin:22px 0}h1 em{color:#E4BD82}
+p{font:32px/1.35 "EB Garamond";color:#d9d3c7;max-width:600px;text-wrap:balance}
+.u{position:absolute;left:72px;bottom:56px;font:18px "Tenor Sans";letter-spacing:.18em;color:#a8a294;text-transform:uppercase}
+</style></head><body><svg id="m" width="1200" height="630"></svg>
+<div class="t"><div class="l">Egypt Eclipse 2027 · Travel</div><h1>Flights to <em>Egypt</em></h1><p>Live fares from 17 major hubs to Cairo, refreshed twice a day.</p></div>
+<div class="u">flights.egypt-eclipse.com</div>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script>
+(async()=>{
+  const topo=await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json").then(r=>r.json());
+  const HUBS={JFK:[-73.78,40.64],IAD:[-77.46,38.95],ORD:[-87.9,41.98],ATL:[-84.43,33.64],MIA:[-80.29,25.79],DFW:[-97.04,32.9],IAH:[-95.34,29.99],LAX:[-118.41,33.94],SFO:[-122.38,37.62],LHR:[-0.45,51.47],CDG:[2.55,49.01],FRA:[8.56,50.03],AMS:[4.76,52.31],IST:[28.74,41.26],DXB:[55.36,25.25],DOH:[51.61,25.27]};
+  const CAI=[31.41,30.12], svg=d3.select('#m');
+  const proj=d3.geoNaturalEarth1().fitExtent([[-80,40],[1290,640]],{type:'MultiPoint',coordinates:[[-126,10],[66,10],[-126,62],[66,62]]});
+  const path=d3.geoPath(proj);
+  const lg=svg.append('defs').append('linearGradient').attr('id','fade');
+  [[0,.9],[.7,.7],[1,0]].forEach(([o,a])=>lg.append('stop').attr('offset',o).attr('stop-color','#101113').attr('stop-opacity',a));
+  svg.append('g').selectAll('path').data(topojson.feature(topo,topo.objects.countries).features).join('path').attr('d',path).attr('fill','#1c1f21').attr('stroke','#101113').attr('stroke-width',.8);
+  for(const k in HUBS){
+    svg.append('path').attr('d',path({type:'LineString',coordinates:[HUBS[k],CAI]})).attr('fill','none').attr('stroke','#E4BD82').attr('stroke-width',1.6).attr('opacity',.55);
+    const [x,y]=proj(HUBS[k]); svg.append('circle').attr('cx',x).attr('cy',y).attr('r',4).attr('fill','#E4BD82').attr('opacity',.8);
+  }
+  svg.append('rect').attr('width',820).attr('height',630).attr('fill','url(#fade)');
+  const [cx,cy]=proj(CAI);
+  svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',16).attr('fill','none').attr('stroke','#E4BD82').attr('stroke-width',1.5).attr('opacity',.5);
+  svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',8).attr('fill','#E4BD82');
+  svg.append('text').attr('x',cx+22).attr('y',cy+6).attr('fill','#E4BD82').attr('font-family','Tenor Sans').attr('font-size',16).attr('letter-spacing','.2em').text('CAIRO');
+  await document.fonts.ready;
+  window.__done=true;
+})();
+</script></body></html>
